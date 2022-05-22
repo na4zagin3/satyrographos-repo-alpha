@@ -1,0 +1,3 @@
+[submodule "satyrographos-repo"]
+	path = satyrographos-repo
+	url = https://github.com/na4zagin3/satyrographos-repo
