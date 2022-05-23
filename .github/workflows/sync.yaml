@@ -16,7 +16,8 @@ jobs:
 
       - name: Update submodules
         run: |
-          git submodule update --remote
+          cd satyrograhos-repo
+          git pull
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
