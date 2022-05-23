@@ -13,11 +13,11 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+          submodule: true
 
       - name: Update submodules
         run: |
-          cd satyrographos-repo
-          git pull
+          git submodule update --remote
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
