@@ -1,0 +1,81 @@
+name: Pull Request Flow
+
+on:
+  pull_request_target:
+    types: [opened, reopened]
+# tags-ignore and/or paths does not work with pull_request_target
+#    tags-ignore:
+#      - "automated pr"
+#    paths:
+#      - "packages/**"
+
+jobs:
+  notify:
+    name: Notify snapshot update
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: List up snapshots
+        id: snapshots
+        run: |
+            echo "::set-output name=snapshots::$(ls -1 snapshot-*.opam | sed -e 's/\.opam$//' | sort -n | tr '\n' ' ')"
+
+      - name: Update the PR body
+        uses: actions/github-script@v2
+        env:
+          SNAPSHOTS: ${{ steps.snapshots.outputs.snapshots }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const pullRequestId = {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            };
+            const pull_request = await github.pulls.get(pullRequestId);
+            const actionHeader = '\n# Automatic follow-ups\n';
+            const body = (pull_request.data.body || '').replace(/\r?\n/g, '\n');
+            console.log('body', body);
+            const splitted = body.split(actionHeader);
+            const actionSectionMessage = 'Choose follow-up actions.  Do not write anything after this section.';
+            const actions =
+              process.env.SNAPSHOTS
+                .split(' ')
+                .filter((snapshot) => snapshot)
+                .map((snapshot) => `- Add to snapshot \`${snapshot}\``);
+            const replacedBody = `${splitted[0]}${actionHeader}${actionSectionMessage}\n${actions.join('\n')}`;
+            console.log('replacedBody', replacedBody);
+            await github.pulls.update({
+              ...pullRequestId,
+              body: replacedBody
+            });
+
+      - name: comment PR
+        uses: actions/github-script@v2
+        env:
+          HEAD_BRANCH: ${{ github.head_ref }}
+          GITHUB_ACTOR: ${{ github.actor }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `
+            🎉🎉🎉 Thank you for sending a PR!
+
+            If this PR is to add new or updated SATySFi libraries, I would like you to include your new library in the package snapshots, by following the instructions below.
+
+            After the CI passes, choose “automatic follow-up” options to add your libraries to add snapshots.
+            Please leave a comment in case you don't want.
+
+            **Notes:** I recommend adding your libraries to the snapshot with the latest develop version as well
+            if your library supports the latest stable version,
+            because the snapshot with the latest develop version will be the snapshot with the the comming SATySFi stable version.
+
+            Thanks!
+            `
+            })
