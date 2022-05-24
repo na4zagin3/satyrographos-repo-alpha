@@ -1,0 +1,50 @@
+name: Snapshot Update Flow
+
+on:
+  schedule:
+    - cron: '52 5 * * *'
+
+jobs:
+  update-snapshot:
+    name: Update snapshots
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: tibdex/github-app-token@v1
+        id: generate-token
+        with:
+          app_id: ${{ secrets.SG_REPO_GH_APP_ID }}
+          private_key: ${{ secrets.SG_REPO_GH_APP_PRIV_KEY }}
+
+      - name: Debug output 1
+        run: |
+          git log -n 10
+      - name: Debug output 2
+        run: |
+          git log -n 10 -- snapshot-develop.opam
+      - name: Take snapshots
+        run: |
+          ./scripts/take-snapshot
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        id: cpr
+        with:
+          # token: ${{ secrets.REPO_PUBLIC }}
+          token: ${{ steps.generate-token.outputs.token }}
+          commit-message: Take snapshots
+          branch: take-snapshots
+          title: '[Automated] Take snapshots'
+          body: |
+            Take snapshots
+          labels: |
+            snapshot
+            automated pr
+          assignees: na4zagin3
+          reviewers: na4zagin3
+          team-reviewers: |
+            owners
+            maintainers
