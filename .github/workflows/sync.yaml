@@ -15,26 +15,9 @@ jobs:
           fetch-depth: 0
           submodules: true
 
-      - name: Debug print
+      - name: Synchronize
         run: |
-          ls -lR
-
-      - name: Update submodules
-        run: |
-          git submodule update --remote
-
-      - name: Copy workflows
-        run: |
-          cp satyrographos-repo/.github/workflows/{ci-comment,pr-followup,pr,snapshot}.yaml .github/workflows
-
-      - name: Debug print
-        run: |
-          ls -lR
-          git diff
-
-#      - uses: stefanzweifel/git-auto-commit-action@v4
-#        with:
-#          commit_message: Pull upstream changes
+          ./sync.sh
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
