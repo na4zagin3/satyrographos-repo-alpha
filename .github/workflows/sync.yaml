@@ -17,7 +17,8 @@ jobs:
 
       - name: Synchronize
         run: |
-          ./sync.sh
+          git submodule update --remote
+          cp satyrographos-repo/.github/workflows/{ci-comment,pr-followup,pr,snapshot}.yaml .github/workflows
 
       - uses: tibdex/github-app-token@v1
         id: generate-token
