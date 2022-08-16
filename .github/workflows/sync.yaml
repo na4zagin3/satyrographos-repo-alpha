@@ -19,9 +19,16 @@ jobs:
         run: |
           ./sync.sh
 
+      - uses: tibdex/github-app-token@v1
+        id: generate-token
+        with:
+          app_id: ${{ secrets.SG_REPO_GH_APP_ID }}
+          private_key: ${{ secrets.SG_REPO_GH_APP_PRIV_KEY }}
+
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
         with:
+          token: ${{ steps.generate-token.outputs.token }}
           branch: automated/catch-up
           labels: "automated pr"
           commit-message: Catch up with Satyrographos Repo
