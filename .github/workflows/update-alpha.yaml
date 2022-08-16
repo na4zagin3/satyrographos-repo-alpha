@@ -38,7 +38,7 @@ jobs:
           branch: take-snapshots
           title: '[Automated] Update alpha snapshot'
           body: |
-            Update develop snapshot
+            Update alpha snapshot
           labels: |
             automated pr
           assignees: na4zagin3
