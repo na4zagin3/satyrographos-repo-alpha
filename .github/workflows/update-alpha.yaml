@@ -2,7 +2,7 @@ name: Update SATySFi Alpha Flow
 
 on:
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '52 10 * * *'
 
 jobs:
   update-snapshot:
