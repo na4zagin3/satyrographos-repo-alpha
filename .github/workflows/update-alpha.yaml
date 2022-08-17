@@ -36,10 +36,12 @@ jobs:
 
       - name: Add the latest SATySFi
         run: |
+          eval $(opam env)
           ./scripts/add-satysfi -b dev-0-1-0 -d -o '0.1.0~alpha' -t '+'
 
       - name: Update the alpha snapshot
         run: |
+          eval $(opam env)
           scripts/update-snapshot-satysfi --opam snapshot-alpha.opam
 
       - name: Create Pull Request
