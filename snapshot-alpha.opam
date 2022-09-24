@@ -13,7 +13,7 @@ synopsis: "Snapshot of libraries in Satyrographos Repo Alpha"
 depends: [
   "dune" {build}
   "ocaml" {>= "4.10.0"}
-  "satysfi" {= "0.1.0~alpha+2022.08.28"}
+  "satysfi" {= "0.1.0~alpha+2022.09.19"}
   "satysfi-dist"
   "satyrographos" {= "0.0.2.11"}
 
