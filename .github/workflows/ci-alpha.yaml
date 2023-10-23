@@ -81,7 +81,7 @@ jobs:
         run: |
           set -exo pipefail
           echo "### OPAM Lint" | tee -a "pr/comment.txt"
-          git diff --name-status origin/master... -- packages/ | sed -e '/^D/d' -e 's/^\w*\s//' | xargs opam lint --color=never --strict | tee -a "pr/comment.txt"
+          git diff --name-status origin/master... -- packages/ | sed -e '/^D/d' -e 's/^\w*\s//' -e '/\/opam/!d' | xargs opam lint --color=never --strict | tee -a "pr/comment.txt"
 
       - name: Install the snapshot
         run: |
@@ -168,6 +168,8 @@ jobs:
           fi
 
       - uses: actions/upload-artifact@v2
+        if: success() || failure()
         with:
           name: "pr-snapshot-${{ matrix.snapshot }}-${{ matrix.ocaml-version }}-${{ matrix.os }}"
           path: pr/
+
